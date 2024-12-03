@@ -1,5 +1,6 @@
 package com.example.city.config;
 
+import com.example.city.service.impl.TokenBlacklistService;
 import com.example.city.service.impl.UserDetailsServiceImpl;
 import com.example.city.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,21 @@ public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Autowired
     public SecurityConfig(UserDetailsServiceImpl userDetailsService,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          TokenBlacklistService tokenBlacklistService) {
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
+        JwtAuthenticationFilter jwtAuthenticationFilter =
+                new JwtAuthenticationFilter(jwtUtil, userDetailsService, tokenBlacklistService);
 
         http
                 .csrf(csrf -> csrf.disable())

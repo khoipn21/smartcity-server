@@ -1,5 +1,6 @@
 package com.example.city.config;
 
+import com.example.city.service.impl.TokenBlacklistService;
 import com.example.city.service.impl.UserDetailsServiceImpl;
 import com.example.city.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -19,10 +20,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, TokenBlacklistService tokenBlacklistService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = extractJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
+            if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt) && !tokenBlacklistService.isTokenBlacklisted(jwt)) {
                 String username = jwtUtil.extractUsername(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -45,7 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
-            // Consider logging the exception
             System.out.println("Could not set user authentication in security context: " + ex);
         }
 
