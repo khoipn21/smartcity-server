@@ -42,6 +42,8 @@ public class AuthController {
         AuthResponse authResponse = AuthResponse.builder()
                 .token(token)
                 .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
                 .build();
         return ResponseEntity.ok(authResponse);
     }
@@ -57,12 +59,20 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        // Retrieve the full User entity using the username
+        User user = userService.findByUsername(userDetails.getUsername());
+
         String token = jwtUtil.generateToken(userDetails);
         String username = userDetails.getUsername();
+        String email = user.getEmail();
+        String fullName = user.getFullName();
 
         AuthResponse authResponse = AuthResponse.builder()
                 .token(token)
                 .username(username)
+                .email(email)
+                .fullName(fullName)
                 .build();
 
         return ResponseEntity.ok(authResponse);
