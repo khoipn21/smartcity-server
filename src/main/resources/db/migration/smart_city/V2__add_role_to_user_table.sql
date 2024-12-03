@@ -1,0 +1,2 @@
+ALTER TABLE smart_city.users
+    ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER';

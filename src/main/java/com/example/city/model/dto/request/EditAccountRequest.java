@@ -1,4 +1,4 @@
-package com.example.city.model.dto.response;
+package com.example.city.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
-    private String token;
-    private String username;
+public class EditAccountRequest {
     private String email;
     private String fullName;
-    private String role;
 }
