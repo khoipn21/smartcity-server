@@ -78,4 +78,21 @@ public class CityServiceImpl implements CityService {
         City city = cityRepository.findById(id).orElseThrow(() -> new RuntimeException("City not found" + id));
         cityRepository.delete(city);
     }
+
+    @Override
+    public List<CityResponse> searchCities(String name, String country) {
+        //Validate search criteria
+        if ((name == null || name.trim().isEmpty()) && (country == null || country.trim().isEmpty())) {
+            throw new RuntimeException("At least one search criterion (name or country) must be provided.");
+        }
+
+        List<City> cities = cityRepository.searchCities(
+                (name != null && !name.trim().isEmpty()) ? name.trim() : null,
+                (country != null && !country.trim().isEmpty()) ? country.trim() : null
+        );
+
+        return cities.stream()
+                .map(city -> modelMapper.map(city, CityResponse.class))
+                .collect(Collectors.toList());
+    }
 }

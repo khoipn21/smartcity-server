@@ -54,10 +54,20 @@ public class CityController {
         return ResponseEntity.ok(updatedCity);
     }
 
+    //Delete city
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCity(@PathVariable Long id) {
         cityService.deleteCity(id);
         return ResponseEntity.ok("City deleted successfully");
+    }
+
+    //Search cities
+    @GetMapping("/search")
+    public ResponseEntity<List<CityResponse>> searchCities(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String country) {
+        List<CityResponse> cities = cityService.searchCities(name, country);
+        return ResponseEntity.ok(cities);
     }
 }
