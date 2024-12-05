@@ -1,6 +1,7 @@
 package com.example.city.controller;
 
 import com.example.city.model.dto.request.CityRequest;
+import com.example.city.model.dto.request.CityUpdateRequest;
 import com.example.city.model.dto.response.CityResponse;
 import com.example.city.service.CityService;
 import jakarta.validation.Valid;
@@ -41,5 +42,15 @@ public class CityController {
     public ResponseEntity<CityResponse> addCity(@RequestBody @Valid CityRequest cityRequest) {
         CityResponse createdCity = cityService.addCity(cityRequest);
         return ResponseEntity.ok(createdCity);
+    }
+
+    //Update city
+    @PutMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CityResponse> updateCity(
+            @PathVariable Long id,
+            @RequestBody @Valid CityUpdateRequest cityUpdateRequest) {
+        CityResponse updatedCity = cityService.updateCity(id, cityUpdateRequest);
+        return ResponseEntity.ok(updatedCity);
     }
 }

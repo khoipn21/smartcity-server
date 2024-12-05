@@ -1,6 +1,7 @@
 package com.example.city.service.impl;
 
 import com.example.city.model.dto.request.CityRequest;
+import com.example.city.model.dto.request.CityUpdateRequest;
 import com.example.city.model.dto.response.CityResponse;
 import com.example.city.model.entity.City;
 import com.example.city.repository.CityRepository;
@@ -36,9 +37,9 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public CityResponse addCity(CityRequest cityRequest) {
-//        if (cityRepository.existsByNameAndCountry(cityRequest.getName(), cityRequest.getCountry())) {
-//            throw new RuntimeException("City with the same name and country already exists");
-//        }
+        if (cityRepository.existsByNameAndCountry(cityRequest.getName(), cityRequest.getCountry())) {
+            throw new RuntimeException("City with the same name and country already exists");
+        }
         City city = City.builder()
                 .name(cityRequest.getName())
                 .country(cityRequest.getCountry())
@@ -48,4 +49,24 @@ public class CityServiceImpl implements CityService {
         return modelMapper.map(savedCity, CityResponse.class);
     }
 
+    @Override
+    public CityResponse updateCity(Long id, CityUpdateRequest cityUpdateRequest) {
+        boolean exists = cityRepository.existsByNameAndCountryAndIdNot(
+                cityUpdateRequest.getName(),
+                cityUpdateRequest.getCountry(),
+                id
+        );
+        if (exists) {
+            throw new RuntimeException("City with the same name and country already exists");
+        }
+        City existingCity = cityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("City not found with ID: " + id));
+
+        existingCity.setName(cityUpdateRequest.getName());
+        existingCity.setCountry(cityUpdateRequest.getCountry());
+        existingCity.setDescription(cityUpdateRequest.getDescription());
+
+        City updatedCity = cityRepository.save(existingCity);
+        return modelMapper.map(updatedCity, CityResponse.class);
+    }
 }

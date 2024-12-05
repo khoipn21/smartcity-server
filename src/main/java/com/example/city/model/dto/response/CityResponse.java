@@ -17,4 +17,5 @@ public class CityResponse {
     private String country;
     private String description;
     private Instant createdAt;
+    private Instant updatedAt;
 }
