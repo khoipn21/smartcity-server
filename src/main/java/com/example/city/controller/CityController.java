@@ -45,7 +45,7 @@ public class CityController {
     }
 
     //Update city
-    @PutMapping("/edit/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CityResponse> updateCity(
             @PathVariable Long id,
