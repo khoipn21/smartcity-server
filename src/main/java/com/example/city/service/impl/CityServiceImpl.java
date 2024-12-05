@@ -1,7 +1,6 @@
 package com.example.city.service.impl;
 
 import com.example.city.model.dto.request.CityRequest;
-import com.example.city.model.dto.request.CityUpdateRequest;
 import com.example.city.model.dto.response.CityResponse;
 import com.example.city.model.entity.City;
 import com.example.city.repository.CityRepository;
@@ -50,10 +49,10 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public CityResponse updateCity(Long id, CityUpdateRequest cityUpdateRequest) {
+    public CityResponse updateCity(Long id, CityRequest cityRequest) {
         boolean exists = cityRepository.existsByNameAndCountryAndIdNot(
-                cityUpdateRequest.getName(),
-                cityUpdateRequest.getCountry(),
+                cityRequest.getName(),
+                cityRequest.getCountry(),
                 id
         );
         if (exists) {
@@ -62,9 +61,9 @@ public class CityServiceImpl implements CityService {
         City existingCity = cityRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("City not found with ID: " + id));
 
-        existingCity.setName(cityUpdateRequest.getName());
-        existingCity.setCountry(cityUpdateRequest.getCountry());
-        existingCity.setDescription(cityUpdateRequest.getDescription());
+        existingCity.setName(cityRequest.getName());
+        existingCity.setCountry(cityRequest.getCountry());
+        existingCity.setDescription(cityRequest.getDescription());
 
         City updatedCity = cityRepository.save(existingCity);
         return modelMapper.map(updatedCity, CityResponse.class);

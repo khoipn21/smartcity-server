@@ -1,7 +1,6 @@
 package com.example.city.service;
 
 import com.example.city.model.dto.request.CityRequest;
-import com.example.city.model.dto.request.CityUpdateRequest;
 import com.example.city.model.dto.response.CityResponse;
 
 import java.util.List;
@@ -13,7 +12,7 @@ public interface CityService {
 
     CityResponse addCity(CityRequest cityRequest);
 
-    CityResponse updateCity(Long id, CityUpdateRequest cityUpdateRequest);
+    CityResponse updateCity(Long id, CityRequest cityRequest);
 
     void deleteCity(Long id);
 
