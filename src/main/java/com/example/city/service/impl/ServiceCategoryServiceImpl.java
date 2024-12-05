@@ -68,4 +68,11 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService {
         // Map to response DTO
         return modelMapper.map(updatedCategory, ServiceCategoryResponse.class);
     }
+
+    @Override
+    public ServiceCategoryResponse getServiceCategoryById(Long categoryId) {
+        ServiceCategory category =
+                serviceCategoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("City not found" + categoryId));
+        return modelMapper.map(category, ServiceCategoryResponse.class);
+    }
 }

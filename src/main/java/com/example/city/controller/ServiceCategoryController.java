@@ -36,6 +36,13 @@ public class ServiceCategoryController {
         return ResponseEntity.ok(categories);
     }
 
+    // Get service category by ID
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<ServiceCategoryResponse> getCityById(@PathVariable Long categoryId) {
+        ServiceCategoryResponse category = serviceCategoryService.getServiceCategoryById(categoryId);
+        return ResponseEntity.ok(category);
+    }
+
     // Update service category
     @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")

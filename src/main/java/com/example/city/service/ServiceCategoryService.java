@@ -10,6 +10,8 @@ public interface ServiceCategoryService {
 
     List<ServiceCategoryResponse> getAllServiceCategories();
 
+    ServiceCategoryResponse getServiceCategoryById(Long categoryId);
+
     ServiceCategoryResponse updateServiceCategory(Long categoryId, ServiceCategoryRequest serviceCategoryUpdateRequest);
 
 }
