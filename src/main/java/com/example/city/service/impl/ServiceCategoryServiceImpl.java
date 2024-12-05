@@ -8,6 +8,9 @@ import com.example.city.service.ServiceCategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ServiceCategoryServiceImpl implements ServiceCategoryService {
     private final ServiceCategoryRepository serviceCategoryRepository;
@@ -26,5 +29,13 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService {
         ServiceCategory serviceCategory = modelMapper.map(serviceCategoryRequest, ServiceCategory.class);
         serviceCategoryRepository.save(serviceCategory);
         return modelMapper.map(serviceCategory, ServiceCategoryResponse.class);
+    }
+
+    @Override
+    public List<ServiceCategoryResponse> getAllServiceCategories() {
+        List<ServiceCategory> categories = serviceCategoryRepository.findAll();
+        return categories.stream()
+                .map(category -> modelMapper.map(category, ServiceCategoryResponse.class))
+                .collect(Collectors.toList());
     }
 }
