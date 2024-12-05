@@ -9,10 +9,11 @@ CREATE TABLE IF NOT EXISTS users
     email      VARCHAR(100) UNIQUE NOT NULL,
     password   VARCHAR(255)        NOT NULL,
     full_name  VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON
+    created_at TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP ON
         UPDATE
-        CURRENT_TIMESTAMP
+        CURRENT_TIMESTAMP,
+    role       VARCHAR(50)         NOT NULL DEFAULT 'ROLE_USER'
 );
 
 CREATE TABLE IF NOT EXISTS cities
@@ -21,10 +22,6 @@ CREATE TABLE IF NOT EXISTS cities
     name        VARCHAR(100) NOT NULL,
     country     VARCHAR(100) NOT NULL,
     description TEXT,
-    latitude    DECIMAL(10,
-                    8),
-    longitude   DECIMAL(11,
-                    8),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

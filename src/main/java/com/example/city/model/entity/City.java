@@ -1,16 +1,17 @@
 package com.example.city.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "cities", schema = "smart_city")
 public class City {
     @Id
@@ -28,14 +29,12 @@ public class City {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "latitude", precision = 10, scale = 8)
-    private BigDecimal latitude;
-
-    @Column(name = "longitude", precision = 11, scale = 8)
-    private BigDecimal longitude;
-
     @ColumnDefault("current_timestamp()")
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+    }
 }

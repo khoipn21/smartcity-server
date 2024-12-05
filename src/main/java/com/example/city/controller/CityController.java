@@ -1,0 +1,45 @@
+package com.example.city.controller;
+
+import com.example.city.model.dto.request.CityRequest;
+import com.example.city.model.dto.response.CityResponse;
+import com.example.city.service.CityService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/cities")
+public class CityController {
+    private final CityService cityService;
+
+    @Autowired
+    public CityController(CityService cityService) {
+        this.cityService = cityService;
+    }
+
+    //Get all cities
+    @GetMapping
+    public ResponseEntity<List<CityResponse>> getAllCities() {
+        List<CityResponse> cities = cityService.getAllCities();
+        return ResponseEntity.ok(cities);
+    }
+
+    //Get city by id
+    @GetMapping("/{id}")
+    public ResponseEntity<CityResponse> getCityById(@PathVariable Long id) {
+        CityResponse city = cityService.getCityById(id);
+        return ResponseEntity.ok(city);
+    }
+
+    //Add city
+    @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CityResponse> addCity(@RequestBody @Valid CityRequest cityRequest) {
+        CityResponse createdCity = cityService.addCity(cityRequest);
+        return ResponseEntity.ok(createdCity);
+    }
+}
