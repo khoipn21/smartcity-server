@@ -8,7 +8,7 @@
 - [Configuration](#configuration)
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
-- [Contributing](#contributing)
+- [Contributor](#contributor)
 
 ## Features
 - **User Authentication & Authorization**: Secure login and registration using JWT.
