@@ -11,6 +11,8 @@ import com.example.city.model.entity.User;
 import com.example.city.service.UserService;
 import com.example.city.service.impl.TokenBlacklistService;
 import com.example.city.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/account")
+@Tag(name = "Authentication", description = "APIs for user authentication and account management")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -43,6 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Register a new user", description = "Registers a new user with the provided details.")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest registerRequest) {
         User user = userService.registerUser(registerRequest);
         String token = jwtUtil.generateToken(user); // User implements UserDetails
@@ -59,6 +63,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token.")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -91,6 +96,7 @@ public class AuthController {
     }
 
     @GetMapping
+    @Operation(summary = "Get current user", description = "Retrieves the details of the currently authenticated user.")
     public ResponseEntity<GetCurrentUserResponse> getCurrentUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userService.findByUsername(userDetails.getUsername());
@@ -106,6 +112,7 @@ public class AuthController {
     }
 
     @PutMapping
+    @Operation(summary = "Edit account", description = "Edits the current user's account details.")
     public ResponseEntity<GetCurrentUserResponse> editAccount(@RequestBody EditAccountRequest editAccountRequest) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User updatedUser = userService.editAccount(userDetails.getUsername(), editAccountRequest);
@@ -121,6 +128,7 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
+    @Operation(summary = "Change password", description = "Changes the password of the current user.")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isChanged = userService.changePassword(userDetails.getUsername(), changePasswordRequest);
@@ -133,6 +141,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Logs out the current user by blacklisting their JWT token.")
     public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
         String jwt = extractJwtFromRequest(request);
         if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
