@@ -70,12 +70,9 @@ CREATE TABLE IF NOT EXISTS visits
 CREATE TABLE IF NOT EXISTS reviews
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id    BIGINT,
-    service_id BIGINT,
-    rating     TINYINT CHECK (rating >= 1
-        AND rating <= 5),
+    visit_id   BIGINT UNIQUE NOT NULL,
+    rating     TINYINT CHECK (rating >= 1 AND rating <= 5),
     comment    TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (service_id) REFERENCES services (id)
+    FOREIGN KEY (visit_id) REFERENCES visits (id)
 );

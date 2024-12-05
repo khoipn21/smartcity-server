@@ -1,6 +1,7 @@
 package com.example.city.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -24,6 +25,7 @@ public class Visit {
     @JoinColumn(name = "service_id")
     private Service service;
 
+    @NotNull
     @ColumnDefault("current_timestamp()")
     @Column(name = "visit_date", nullable = false)
     private Instant visitDate;
