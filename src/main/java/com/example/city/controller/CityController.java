@@ -37,7 +37,7 @@ public class CityController {
     }
 
     //Add city
-    @PostMapping("/add")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CityResponse> addCity(@RequestBody @Valid CityRequest cityRequest) {
         CityResponse createdCity = cityService.addCity(cityRequest);
