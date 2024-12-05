@@ -14,4 +14,5 @@ public interface ServiceCategoryService {
 
     ServiceCategoryResponse updateServiceCategory(Long categoryId, ServiceCategoryRequest serviceCategoryUpdateRequest);
 
+    void deleteServiceCategory(Long categoryId);
 }

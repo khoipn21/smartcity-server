@@ -75,4 +75,11 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService {
                 serviceCategoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("City not found" + categoryId));
         return modelMapper.map(category, ServiceCategoryResponse.class);
     }
+
+    @Override
+    public void deleteServiceCategory(Long categoryId) {
+        ServiceCategory existingCategory = serviceCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Service category not found with ID: " + categoryId));
+        serviceCategoryRepository.delete(existingCategory);
+    }
 }

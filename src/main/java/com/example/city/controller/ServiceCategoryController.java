@@ -53,4 +53,12 @@ public class ServiceCategoryController {
                 serviceCategoryRequest);
         return ResponseEntity.ok(updatedCategory);
     }
+
+    // Delete service category
+    @DeleteMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteServiceCategory(@PathVariable Long categoryId) {
+        serviceCategoryService.deleteServiceCategory(categoryId);
+        return ResponseEntity.ok("Service category deleted successfully");
+    }
 }
