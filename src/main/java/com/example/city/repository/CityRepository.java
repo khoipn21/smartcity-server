@@ -9,4 +9,6 @@ public interface CityRepository extends JpaRepository<City, Long> {
     boolean existsByNameAndCountry(String name, String country);
 
     boolean existsByNameAndCountryAndIdNot(String name, String country, Long id);
+
+//    boolean existsByCity(Long id);
 }

@@ -69,4 +69,13 @@ public class CityServiceImpl implements CityService {
         City updatedCity = cityRepository.save(existingCity);
         return modelMapper.map(updatedCity, CityResponse.class);
     }
+
+    @Override
+    public void deleteCity(Long id) {
+//        if (cityRepository.existsByCity(id)) {
+//            throw new RuntimeException("Cannot delete city as it is referenced by existing services.");
+//        }
+        City city = cityRepository.findById(id).orElseThrow(() -> new RuntimeException("City not found" + id));
+        cityRepository.delete(city);
+    }
 }
