@@ -46,6 +46,7 @@ spring.datasource.url=jdbc:mysql://localhost:3306/smart_city?createDatabaseIfNot
 spring.datasource.username=your_db_username
 spring.datasource.password=your_db_password
 ```
+
 ## Configuration
 ### JWT Configuration
 The application uses JWT for authentication. Ensure the JWT secret is set in the `application.properties` file.
@@ -66,6 +67,7 @@ jwt.expiration=86400000
   ```properties
   spring.jpa.hibernate.ddl-auto=none
   ```
+  
 ## Running the Application
 ### Using Local Maven Installation
 If you have Maven installed locally, you can use the following commands:
@@ -73,12 +75,14 @@ If you have Maven installed locally, you can use the following commands:
 mvn clean install
 mvn spring-boot:run
 ```
+
 ## API Documentation
 Interactive API documentation is available via Swagger/OpenAPI.
 - **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **OpenAPI Docs**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 > **Note**: Ensure the application is running to access the API documentation.
-## Contributing
+
+## Contributor
 - [Pham Ngoc Khoi](https://github.com/khoipn21)
 - [Pham Thanh Duong](https://github.com/duongpham26)
 
