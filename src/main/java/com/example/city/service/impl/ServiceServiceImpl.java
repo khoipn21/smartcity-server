@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @org.springframework.stereotype.Service
 public class ServiceServiceImpl implements ServiceService {
     private static final Logger logger = LoggerFactory.getLogger(ServiceServiceImpl.class);
@@ -64,5 +67,26 @@ public class ServiceServiceImpl implements ServiceService {
 //        System.out.println("Mapped service response: {}" + serviceResponse);
 
         return serviceResponse;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ServiceResponse> getAllServicesInCity(Long cityId) {
+        // Validate city existence
+        City city = cityRepository.findById(cityId)
+                .orElseThrow(() -> new RuntimeException("City not found with ID: " + cityId));
+
+        // Retrieve all services for the city
+        List<Service> services = serviceRepository.findByCityId(cityId);
+
+        // Map entities to response DTOs
+        return services.stream()
+                .map(service -> {
+                    ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+                    response.setCategoryName(service.getCategory().getName());
+                    response.setCityName(city.getName());
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 }
