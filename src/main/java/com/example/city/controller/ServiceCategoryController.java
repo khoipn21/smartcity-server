@@ -35,4 +35,15 @@ public class ServiceCategoryController {
         List<ServiceCategoryResponse> categories = serviceCategoryService.getAllServiceCategories();
         return ResponseEntity.ok(categories);
     }
+
+    // Update service category
+    @PutMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ServiceCategoryResponse> updateServiceCategory(
+            @PathVariable Long categoryId,
+            @RequestBody @Valid ServiceCategoryRequest serviceCategoryRequest) {
+        ServiceCategoryResponse updatedCategory = serviceCategoryService.updateServiceCategory(categoryId,
+                serviceCategoryRequest);
+        return ResponseEntity.ok(updatedCategory);
+    }
 }

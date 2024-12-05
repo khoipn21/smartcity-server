@@ -9,4 +9,7 @@ public interface ServiceCategoryService {
     ServiceCategoryResponse createServiceCategory(ServiceCategoryRequest serviceCategoryRequest);
 
     List<ServiceCategoryResponse> getAllServiceCategories();
+
+    ServiceCategoryResponse updateServiceCategory(Long categoryId, ServiceCategoryRequest serviceCategoryUpdateRequest);
+
 }

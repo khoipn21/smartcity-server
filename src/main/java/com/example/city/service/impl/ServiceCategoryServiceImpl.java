@@ -38,4 +38,34 @@ public class ServiceCategoryServiceImpl implements ServiceCategoryService {
                 .map(category -> modelMapper.map(category, ServiceCategoryResponse.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public ServiceCategoryResponse updateServiceCategory(Long categoryId,
+                                                         ServiceCategoryRequest serviceCategoryRequest) {
+        // Fetch the existing service category
+        ServiceCategory existingCategory = serviceCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Service category not found with ID: " + categoryId));
+
+        // Check if the updated name already exists (and is not the current category)
+        if (serviceCategoryRequest.getName() != null &&
+                !serviceCategoryRequest.getName().equals(existingCategory.getName()) &&
+                serviceCategoryRepository.existsByName(serviceCategoryRequest.getName())) {
+            throw new RuntimeException("Service category with name " + serviceCategoryRequest.getName() + " already " +
+                    "exists");
+        }
+
+        // Update fields if they are provided
+        if (serviceCategoryRequest.getName() != null) {
+            existingCategory.setName(serviceCategoryRequest.getName());
+        }
+        if (serviceCategoryRequest.getDescription() != null) {
+            existingCategory.setDescription(serviceCategoryRequest.getDescription());
+        }
+
+        // Save the updated entity
+        ServiceCategory updatedCategory = serviceCategoryRepository.save(existingCategory);
+
+        // Map to response DTO
+        return modelMapper.map(updatedCategory, ServiceCategoryResponse.class);
+    }
 }
