@@ -1,8 +1,7 @@
 package com.example.city.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
@@ -10,9 +9,13 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "services", schema = "smart_city")
 public class Service {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -47,4 +50,16 @@ public class Service {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    // Optional: Automatically set createdAt before persisting
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+    }
+
+    // Optional: Automatically update updatedAt before updating
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }

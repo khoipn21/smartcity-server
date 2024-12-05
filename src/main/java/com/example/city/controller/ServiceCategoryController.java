@@ -38,7 +38,7 @@ public class ServiceCategoryController {
 
     // Get service category by ID
     @GetMapping("/{categoryId}")
-    public ResponseEntity<ServiceCategoryResponse> getCityById(@PathVariable Long categoryId) {
+    public ResponseEntity<ServiceCategoryResponse> getServiceCategoryById(@PathVariable Long categoryId) {
         ServiceCategoryResponse category = serviceCategoryService.getServiceCategoryById(categoryId);
         return ResponseEntity.ok(category);
     }
