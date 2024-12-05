@@ -29,6 +29,7 @@ public class ServiceCategoryController {
         return ResponseEntity.ok(createdCategory);
     }
 
+    // Get all service categories
     @GetMapping
     public ResponseEntity<List<ServiceCategoryResponse>> getAllServiceCategories() {
         List<ServiceCategoryResponse> categories = serviceCategoryService.getAllServiceCategories();
