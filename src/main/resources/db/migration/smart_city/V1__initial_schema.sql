@@ -32,7 +32,11 @@ CREATE TABLE IF NOT EXISTS service_categories
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     name        VARCHAR(50) NOT NULL,
-    description TEXT
+    description TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON
+        UPDATE
+        CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS services
@@ -46,6 +50,9 @@ CREATE TABLE IF NOT EXISTS services
     contact_info    VARCHAR(255),
     operating_hours TEXT,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON
+        UPDATE
+        CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES service_categories (id),
     FOREIGN KEY (city_id) REFERENCES cities (id)
 );
