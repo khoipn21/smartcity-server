@@ -166,7 +166,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Change User Role", description = "Allows an admin to change the role of a user.")
     public ResponseEntity<String> changeUserRole(@Valid @RequestBody ChangeUserRoleRequest changeUserRoleRequest) {
-        userService.changeUserRolgite(changeUserRoleRequest);
+        userService.changeUserRole(changeUserRoleRequest);
         return ResponseEntity.ok("User role updated successfully.");
     }
 
