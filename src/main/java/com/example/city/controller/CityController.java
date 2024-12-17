@@ -38,7 +38,7 @@ public class CityController {
         return ResponseEntity.ok(city);
     }
 
-    @PostMapping("/")
+    @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Add a new city", description = "Creates a new city. Only admins can perform this action.")
     public ResponseEntity<CityResponse> addCity(@RequestBody @Valid CityRequest cityRequest) {

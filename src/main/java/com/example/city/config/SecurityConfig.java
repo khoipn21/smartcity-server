@@ -56,7 +56,7 @@ public class SecurityConfig {
                         ).permitAll()
                         // Other public endpoints
                         .requestMatchers("/api/account/register", "/api/account/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/cities/**").permitAll()
+                        .requestMatchers("/api/cities/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/service-categories/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -73,7 +73,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Replace with your allowed domain(s)
-        configuration.setAllowedOrigins(Arrays.asList("http://yourdomain.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
 
         // Specify the allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

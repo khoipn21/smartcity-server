@@ -1,12 +1,10 @@
 package com.example.city.controller;
 
-import com.example.city.model.dto.request.ChangePasswordRequest;
-import com.example.city.model.dto.request.EditAccountRequest;
-import com.example.city.model.dto.request.LoginRequest;
-import com.example.city.model.dto.request.RegisterRequest;
+import com.example.city.model.dto.request.*;
 import com.example.city.model.dto.response.AuthResponse;
 import com.example.city.model.dto.response.GetCurrentUserResponse;
 import com.example.city.model.dto.response.LogoutResponse;
+import com.example.city.model.dto.response.UserResponse;
 import com.example.city.model.entity.User;
 import com.example.city.service.UserService;
 import com.example.city.service.impl.TokenBlacklistService;
@@ -14,6 +12,7 @@ import com.example.city.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/account")
@@ -47,7 +50,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Registers a new user with the provided details.")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
         User user = userService.registerUser(registerRequest);
         String token = jwtUtil.generateToken(user); // User implements UserDetails
 
@@ -157,6 +160,22 @@ public class AuthController {
                     .build();
             return ResponseEntity.badRequest().body(logoutResponse);
         }
+    }
+
+    @PutMapping("/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Change User Role", description = "Allows an admin to change the role of a user.")
+    public ResponseEntity<String> changeUserRole(@Valid @RequestBody ChangeUserRoleRequest changeUserRoleRequest) {
+        userService.changeUserRolgite(changeUserRoleRequest);
+        return ResponseEntity.ok("User role updated successfully.");
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get All Users", description = "Retrieves a list of all registered users. Accessible only by admins.")
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {
