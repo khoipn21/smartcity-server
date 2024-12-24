@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,4 +25,5 @@ public class ServiceResponse {
     private String operatingHours;
     private Instant createdAt;
     private Instant updatedAt;
+    private List<String> imageUrls;
 }

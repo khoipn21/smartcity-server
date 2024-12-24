@@ -29,6 +29,8 @@ public class DetailServiceResponse {
 
    private List<ReviewService> ReviewService;
 
+   private List<String> imageUrls;
+
    @Getter
    @Setter
    public static class ReviewService {
