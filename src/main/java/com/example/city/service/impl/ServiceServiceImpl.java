@@ -142,7 +142,7 @@ public class ServiceServiceImpl implements ServiceService {
         public ServiceResponse updateService(Long id, ServiceRequest serviceRequest) {
                 boolean exists = serviceRepository.existsByNameAndIdNot(serviceRequest.getName(), id);
                 if (exists) {
-                        throw new RuntimeException("City with the same name and country already exists");
+                        throw new RuntimeException("Service with the same name already exists");
                 }
                 Service existingService = serviceRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Service not found with ID: " + id));
