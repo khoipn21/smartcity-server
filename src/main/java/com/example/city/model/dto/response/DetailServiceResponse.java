@@ -15,8 +15,6 @@ public class DetailServiceResponse {
 
    private Long id;
 
-   private City city;
-
    private String name;
 
    private String description;
@@ -38,4 +36,5 @@ public class DetailServiceResponse {
       private Byte rating;
       private String comment;
    }
+   
 }
