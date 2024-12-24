@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Arrays;
 
@@ -56,10 +57,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        // Permit access to images
+                        .requestMatchers("/api/images/**").permitAll()
                         // Other public endpoints
                         .requestMatchers("/api/account/register", "/api/account/login").permitAll()
                         .requestMatchers("/api/cities/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/service-categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/allservices/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

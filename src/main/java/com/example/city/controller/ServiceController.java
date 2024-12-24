@@ -52,21 +52,25 @@ public class ServiceController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update an existing service with images", description = "Updates the details and images of an existing service by its ID. Only admins can perform this action.")
+    @Operation(summary = "Update an existing service with images", description = "Updates the details and images of an existing service. Only admins can perform this action.")
     public ResponseEntity<ServiceResponse> updateService(
+            @PathVariable Long cityId,
             @PathVariable Long id,
             @ModelAttribute @Valid ServiceRequest serviceRequest,
-            @RequestParam(value = "images", required = false) MultipartFile[] images) {
-        ServiceResponse updatedService = serviceService.updateService(id, serviceRequest, images);
+            @RequestParam(value = "images", required = false) MultipartFile[] images,
+            @RequestParam(value = "imagesToDelete", required = false) List<String> imagesToDelete) {
+        ServiceResponse updatedService = serviceService.updateService(cityId, id, serviceRequest, images, imagesToDelete);
         return ResponseEntity.ok(updatedService);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Delete a service", description = "Deletes a service by its ID. Only admins can perform this action.")
-    public ResponseEntity<String> deleteService(@PathVariable Long id) {
-        serviceService.deleteService(id);
-        return ResponseEntity.ok("Service deleted successfully");
+    @Operation(summary = "Delete a service", description = "Deletes a specific service from a city. Only admins can perform this action.")
+    public ResponseEntity<Void> deleteService(
+            @PathVariable Long cityId,
+            @PathVariable Long id) {
+        serviceService.deleteService(cityId, id);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -14,7 +14,9 @@ public interface ServiceService {
 
     DetailServiceResponse getServiceById(Long id);
 
-    ServiceResponse updateService(Long id, ServiceRequest serviceRequest, MultipartFile[] images);
+    ServiceResponse updateService(Long cityId, Long serviceId, ServiceRequest serviceRequest, MultipartFile[] images, List<String> imagesToDelete);
 
-    void deleteService(Long id);
+    void deleteService(Long cityId, Long serviceId);
+
+    List<ServiceResponse> getAllServices();
 }

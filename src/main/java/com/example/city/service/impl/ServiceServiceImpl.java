@@ -24,6 +24,8 @@ import com.example.city.model.entity.ServiceImage;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Collections;
 
 @org.springframework.stereotype.Service
 public class ServiceServiceImpl implements ServiceService {
@@ -92,7 +94,7 @@ public class ServiceServiceImpl implements ServiceService {
 
                                                 // Create and save the ServiceImage entity
                                                 ServiceImage serviceImage = ServiceImage.builder()
-                                                        .imageUrl("/" + UPLOAD_DIR + filename)
+                                                        .imageUrl(filename) // Store only the filename
                                                         .service(savedService)
                                                         .build();
 
@@ -104,17 +106,16 @@ public class ServiceServiceImpl implements ServiceService {
                         }
                 }
 
-                // Retrieve all image URLs for the service
-                List<String> imageUrls = serviceImageRepository.findByServiceId(savedService.getId())
-                        .stream()
-                        .map(ServiceImage::getImageUrl)
-                        .collect(Collectors.toList());
-
                 // Map to ServiceResponse and set additional fields
                 ServiceResponse serviceResponse = modelMapper.map(savedService, ServiceResponse.class);
-                serviceResponse.setCategoryName(serviceCategory.getName());
-                serviceResponse.setCityName(city.getName());
-                serviceResponse.setImageUrls(imageUrls);
+                serviceResponse.setCategoryName(savedService.getCategory().getName());
+                serviceResponse.setCityName(savedService.getCity().getName());
+                serviceResponse.setImageUrls(
+                        serviceImageRepository.findByServiceId(savedService.getId())
+                                .stream()
+                                .map(ServiceImage::getImageUrl)
+                                .collect(Collectors.toList())
+                );
 
                 return serviceResponse;
         }
@@ -129,15 +130,35 @@ public class ServiceServiceImpl implements ServiceService {
                 // Retrieve all services for the city
                 List<Service> services = serviceRepository.findByCityId(cityId);
 
-                // Map entities to response DTOs
+                // Extract service IDs for bulk image retrieval
+                List<Long> serviceIds = services.stream()
+                        .map(Service::getId)
+                        .collect(Collectors.toList());
+
+                // Fetch all images for the services in one query
+                List<ServiceImage> serviceImages = serviceImageRepository.findByServiceIdIn(serviceIds);
+
+                // Group image URLs by service ID
+                Map<Long, List<String>> serviceImageMap = serviceImages.stream()
+                        .collect(Collectors.groupingBy(
+                                image -> image.getService().getId(),
+                                Collectors.mapping(ServiceImage::getImageUrl, Collectors.toList())
+                        ));
+
+                // Map services to ServiceResponse DTOs with imageUrls
                 return services.stream()
-                                .map(service -> {
-                                        ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
-                                        response.setCategoryName(service.getCategory().getName());
-                                        response.setCityName(city.getName());
-                                        return response;
-                                })
-                                .collect(Collectors.toList());
+                        .map(service -> {
+                                ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+                                response.setCategoryName(service.getCategory().getName());
+                                response.setCityName(city.getName());
+
+                                // Set image URLs for the service
+                                List<String> imageUrls = serviceImageMap.getOrDefault(service.getId(), Collections.emptyList());
+                                response.setImageUrls(imageUrls);
+
+                                return response;
+                        })
+                        .collect(Collectors.toList());
         }
 
         @Override
@@ -186,33 +207,44 @@ public class ServiceServiceImpl implements ServiceService {
 
         @Override
         @Transactional
-        public ServiceResponse updateService(Long id, ServiceRequest serviceRequest, MultipartFile[] images) {
-                boolean exists = serviceRepository.existsByNameAndIdNot(serviceRequest.getName(), id);
-                if (exists) {
-                        throw new RuntimeException("Service with the same name already exists");
-                }
+        public ServiceResponse updateService(Long cityId, Long serviceId, ServiceRequest serviceRequest, MultipartFile[] images, List<String> imagesToDelete) {
+                City city = cityRepository.findById(cityId)
+                        .orElseThrow(() -> new RuntimeException("City not found with ID: " + cityId));
 
-                Service existingService = serviceRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Service not found with ID: " + id));
+                ServiceCategory serviceCategory = serviceCategoryRepository.findById(serviceRequest.getCategoryId())
+                        .orElseThrow(() -> new RuntimeException("Service category not found with ID: " + serviceRequest.getCategoryId()));
+
+                Service existingService = serviceRepository.findById(serviceId)
+                        .orElseThrow(() -> new RuntimeException("Service not found with ID: " + serviceId));
 
                 existingService.setName(serviceRequest.getName());
                 existingService.setDescription(serviceRequest.getDescription());
                 existingService.setAddress(serviceRequest.getAddress());
+                existingService.setContactInfo(serviceRequest.getContactInfo());
+                existingService.setOperatingHours(serviceRequest.getOperatingHours());
+                existingService.setCategory(serviceCategory);
 
-                // Handle image updates
-                if (images != null && images.length > 0) {
-                        List<ServiceImage> existingImages = serviceImageRepository.findByServiceId(id);
-                        for (ServiceImage image : existingImages) {
-                                String imagePath = image.getImageUrl().replace("/" + UPLOAD_DIR, UPLOAD_DIR);
-                                Path filePath = Paths.get(imagePath);
+                // Handle image deletions
+                if (imagesToDelete != null && !imagesToDelete.isEmpty()) {
+                        for (String filename : imagesToDelete) {
+                                // Delete file from filesystem
+                                Path filePath = Paths.get(UPLOAD_DIR).resolve(filename).normalize();
                                 try {
                                         Files.deleteIfExists(filePath);
-                                        serviceImageRepository.delete(image);
                                 } catch (IOException e) {
-                                        throw new RuntimeException("Failed to delete image " + image.getImageUrl(), e);
+                                        logger.error("Failed to delete image file: {}", filename, e);
+                                        throw new RuntimeException("Failed to delete image " + filename, e);
                                 }
-                        }
 
+                                // Delete from database
+                                ServiceImage serviceImage = serviceImageRepository.findByServiceIdAndImageUrl(serviceId, filename)
+                                        .orElseThrow(() -> new RuntimeException("Image not found: " + filename));
+                                serviceImageRepository.delete(serviceImage);
+                        }
+                }
+
+                // Handle new image uploads
+                if (images != null && images.length > 0) {
                         for (MultipartFile image : images) {
                                 if (!image.isEmpty()) {
                                         try {
@@ -231,7 +263,7 @@ public class ServiceServiceImpl implements ServiceService {
 
                                                 // Create and save the ServiceImage entity
                                                 ServiceImage serviceImage = ServiceImage.builder()
-                                                        .imageUrl("/" + UPLOAD_DIR + filename)
+                                                        .imageUrl(filename) // Store only the filename
                                                         .service(existingService)
                                                         .build();
 
@@ -246,41 +278,71 @@ public class ServiceServiceImpl implements ServiceService {
                 // Save the updated service
                 Service updatedService = serviceRepository.save(existingService);
 
-                // Retrieve all image URLs for the service after update
-                List<String> imageUrls = serviceImageRepository.findByServiceId(updatedService.getId())
-                        .stream()
-                        .map(ServiceImage::getImageUrl)
-                        .collect(Collectors.toList());
-
                 // Map to ServiceResponse and set additional fields
                 ServiceResponse serviceResponse = modelMapper.map(updatedService, ServiceResponse.class);
-                serviceResponse.setCategoryName(existingService.getCategory().getName());
-                serviceResponse.setCityName(existingService.getCity().getName());
-                serviceResponse.setImageUrls(imageUrls);
+                serviceResponse.setCategoryName(updatedService.getCategory().getName());
+                serviceResponse.setCityName(updatedService.getCity().getName());
+                serviceResponse.setImageUrls(
+                        serviceImageRepository.findByServiceId(updatedService.getId())
+                                .stream()
+                                .map(ServiceImage::getImageUrl)
+                                .collect(Collectors.toList())
+                );
 
                 return serviceResponse;
         }
 
         @Override
-        public void deleteService(Long id) {
-                Service service = serviceRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Service not found with ID: " + id));
+        @Transactional
+        public void deleteService(Long cityId, Long serviceId) {
+                Service service = serviceRepository.findById(serviceId)
+                        .orElseThrow(() -> new RuntimeException("Service not found with ID: " + serviceId));
 
                 // Retrieve associated images
-                List<ServiceImage> images = serviceImageRepository.findByServiceId(id);
+                List<ServiceImage> images = serviceImageRepository.findByServiceId(serviceId);
                 for (ServiceImage image : images) {
-                        Path filePath = Paths.get(image.getImageUrl().replace("/" + UPLOAD_DIR, UPLOAD_DIR));
+                        // Delete file from filesystem
+                        Path filePath = Paths.get(UPLOAD_DIR).resolve(image.getImageUrl()).normalize();
                         try {
                                 Files.deleteIfExists(filePath);
                         } catch (IOException e) {
-                                logger.error("Failed to delete image file: " + filePath, e);
+                                logger.error("Failed to delete image file: {}", image.getImageUrl(), e);
+                                throw new RuntimeException("Failed to delete image " + image.getImageUrl(), e);
                         }
-                }
 
-                // Delete image records from the database
-                serviceImageRepository.deleteAll(images);
+                        // Delete from database
+                        serviceImageRepository.delete(image);
+                }
 
                 // Delete the service
                 serviceRepository.delete(service);
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<ServiceResponse> getAllServices() {
+                List<Service> services = serviceRepository.findAll();
+
+                List<Long> serviceIds = services.stream()
+                        .map(Service::getId)
+                        .collect(Collectors.toList());
+
+                List<ServiceImage> serviceImages = serviceImageRepository.findByServiceIdIn(serviceIds);
+
+                Map<Long, List<String>> serviceImageMap = serviceImages.stream()
+                        .collect(Collectors.groupingBy(
+                                image -> image.getService().getId(),
+                                Collectors.mapping(ServiceImage::getImageUrl, Collectors.toList())
+                        ));
+
+                return services.stream()
+                        .map(service -> {
+                                ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+                                response.setCategoryName(service.getCategory().getName());
+                                response.setCityName(service.getCity().getName());
+                                response.setImageUrls(serviceImageMap.getOrDefault(service.getId(), Collections.emptyList()));
+                                return response;
+                        })
+                        .collect(Collectors.toList());
         }
 }
