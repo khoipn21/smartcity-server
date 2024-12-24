@@ -1,12 +1,12 @@
 package com.example.city.controller;
 
 import com.example.city.model.dto.request.ServiceRequest;
+import com.example.city.model.dto.response.DetailServiceResponse;
 import com.example.city.model.dto.response.ServiceResponse;
 import com.example.city.service.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,6 @@ import java.util.List;
 public class ServiceController {
     private final ServiceService serviceService;
 
-    @Autowired
     public ServiceController(ServiceService serviceService) {
         this.serviceService = serviceService;
     }
@@ -40,4 +39,30 @@ public class ServiceController {
         List<ServiceResponse> services = serviceService.getAllServicesInCity(cityId);
         return ResponseEntity.ok(services);
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get all services in a city", description = "Retrieves all services available in a specific city.")
+    public ResponseEntity<DetailServiceResponse> getDetailInCity(@PathVariable Long id) {
+        DetailServiceResponse services = serviceService.getServiceById(id);
+        return ResponseEntity.ok(services);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update an existing service", description = "Updates the details of an existing service by its ID. Only admins can perform this action.")
+    public ResponseEntity<ServiceResponse> updateService(
+            @PathVariable Long id,
+            @RequestBody @Valid ServiceRequest serviceRequest) {
+        ServiceResponse updatedService = serviceService.updateService(id, serviceRequest);
+        return ResponseEntity.ok(updatedService);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete a service", description = "Deletes a service by its ID. Only admins can perform this action.")
+    public ResponseEntity<String> deleteService(@PathVariable Long id) {
+        serviceService.deleteService(id);
+        return ResponseEntity.ok("Service deleted successfully");
+    }
+    
 }
