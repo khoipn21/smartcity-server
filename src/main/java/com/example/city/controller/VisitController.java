@@ -29,6 +29,7 @@ public class VisitController {
    }
 
    @PostMapping("/services/{serviceId}/visit")
+   @PreAuthorize("hasRole('ADMIN')")
    @Operation(summary = "Add a visit to Service", description = "Adds a new visit to a specific service. Only user can perform this action.")
    public ResponseEntity<String> addVisitService(@PathVariable Long serviceId) {
             this.visitService.addVisitToService(serviceId);
@@ -36,15 +37,13 @@ public class VisitController {
    }
 
    @GetMapping("/visits")
-   @PreAuthorize("hasRole('ADMIN')")
-   @Operation(summary = "Add a visit to Service", description = "Adds a new visit to a specific service. Only user can perform this action.")
+   @Operation(summary = "Get all visits", description = "Get all visits for all services.")
    public ResponseEntity<List<VisitResponse>> getAllVisit() {
       List<VisitResponse> res = this.visitService.getAllVisits();
       return ResponseEntity.ok(res);
    }
 
    @GetMapping("/services/{serviceId}/visits")
-   @PreAuthorize("hasRole('USER')")
    @Operation(summary = "Get all visits for a service", description = "Retrieves all visits for a specific service.")
    public ResponseEntity<VisitServiceResponse> getAllVisitService(@PathVariable Long serviceId) {
       VisitServiceResponse res = this.visitService.getAllVisitService(serviceId);

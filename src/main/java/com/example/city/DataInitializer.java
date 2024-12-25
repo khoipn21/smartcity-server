@@ -26,7 +26,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    private final Faker faker = new Faker(new Locale("eng"));
+    private final Faker faker = new Faker(Locale.ENGLISH);
     private final Random random = new Random();
 
     public DataInitializer(UserRepository userRepository,
