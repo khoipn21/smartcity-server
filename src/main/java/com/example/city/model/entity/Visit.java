@@ -39,7 +39,8 @@ public class Visit {
 
     @PrePersist
     protected void onCreate() {
-        Instant now = Instant.now();
-        visitDate = now;
+        if (this.visitDate == null) {
+            this.visitDate = Instant.now();
+        }
     }
 }

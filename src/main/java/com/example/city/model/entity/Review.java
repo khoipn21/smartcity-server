@@ -2,8 +2,7 @@ package com.example.city.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
@@ -11,6 +10,9 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "reviews", schema = "smart_city")
 public class Review {
     @Id
@@ -38,8 +40,9 @@ public class Review {
 
     @PrePersist
     protected void onCreate() {
-        Instant now = Instant.now();
-        createdAt = now;
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
         // updatedAt = now;
     }
 
