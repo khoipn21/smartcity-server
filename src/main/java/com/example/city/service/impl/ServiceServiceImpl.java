@@ -14,12 +14,16 @@ import com.example.city.repository.ServiceCategoryRepository;
 import com.example.city.repository.ServiceRepository;
 import com.example.city.repository.VisitRepository;
 import com.example.city.service.ServiceService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
@@ -108,9 +112,12 @@ public class ServiceServiceImpl implements ServiceService {
         @Override
         public DetailServiceResponse getServiceById(Long id) {
                 DetailServiceResponse res = new DetailServiceResponse();
-                DetailServiceResponse.ReviewService reviewService = new DetailServiceResponse.ReviewService();
 
                 Service currentService = serviceRepository.findById(id).get();
+                
+                if(currentService == null) {
+                        throw new RuntimeException("Service not found with ID: " + id);
+                }
 
                 res.setId(currentService.getId());
                 res.setAddress(currentService.getAddress());
@@ -126,15 +133,20 @@ public class ServiceServiceImpl implements ServiceService {
                         List<DetailServiceResponse.ReviewService> rs = visits.stream().map(visit -> {
                                 Review review = this.reviewRepository.findByVisitId(visit.getId());
                                 if (review != null) {
-                                        reviewService.setId(review.getId());
-                                        reviewService.setComment(review.getComment());
-                                        reviewService.setRating(review.getRating());
-                                        return reviewService;
+                                        DetailServiceResponse.ReviewService tempReview = new DetailServiceResponse.ReviewService();
+                                        tempReview.setId(review.getId());
+                                        tempReview.setComment(review.getComment());
+                                        tempReview.setRating(review.getRating());
+                                        return tempReview;
                                 }
                                 return null;
-                        }).collect(Collectors.toList());
+                        })
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
                         res.setReviewService(rs);
                 }
+
                 return res;
         }
 

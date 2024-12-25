@@ -41,7 +41,7 @@ public class ServiceController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get all services in a city", description = "Retrieves all services available in a specific city.")
+    @Operation(summary = "Get a service in a city", description = "Retrieves a service available in a specific city.")
     public ResponseEntity<DetailServiceResponse> getDetailInCity(@PathVariable Long id) {
         DetailServiceResponse services = serviceService.getServiceById(id);
         return ResponseEntity.ok(services);
