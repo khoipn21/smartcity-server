@@ -76,3 +76,11 @@ CREATE TABLE IF NOT EXISTS reviews
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (visit_id) REFERENCES visits (id)
 );
+
+CREATE TABLE IF NOT EXISTS service_images
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    service_id BIGINT NOT NULL,
+    image_url  VARCHAR(255) NOT NULL,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    );

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewRequest {
 
-   @NotNull(message = "Service category ID is required")
+   @NotNull(message = "Rating is required")
    private byte rating;
 
    @Size(max = 500, message = "Comment must be less than 500 characters")

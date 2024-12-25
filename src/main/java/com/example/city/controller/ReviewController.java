@@ -32,7 +32,6 @@ public class ReviewController {
    }
 
    @PostMapping
-   @PreAuthorize("hasRole('USER')")
    @Operation(summary = "Add a Review to Service", description = "Adds a new review to a specific service. Only user can perform this action.")
    public ResponseEntity<ReviewResponse> addReviewService(
          @PathVariable Long serviceId,
@@ -43,7 +42,6 @@ public class ReviewController {
 
    
    @GetMapping
-   @PreAuthorize("hasRole('USER')")
    @Operation(summary = "Get all reviews of Service", description = "Get all reviews of a specific service. Only user can perform this action.")
    public ResponseEntity<List<ReviewServiceResponse>> getReviewOfService(@PathVariable Long serviceId) {
       List<ReviewServiceResponse> res = this.reviewService.getReviewsOfService(serviceId);
