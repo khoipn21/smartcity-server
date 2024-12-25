@@ -64,5 +64,4 @@ public class ServiceController {
         serviceService.deleteService(id);
         return ResponseEntity.ok("Service deleted successfully");
     }
-    
 }
