@@ -19,12 +19,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Arrays;
 
 @Configuration
 @EnableMethodSecurity
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
@@ -54,10 +57,13 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        // Permit access to images
+                        .requestMatchers("/api/images/**").permitAll()
                         // Other public endpoints
                         .requestMatchers("/api/account/register", "/api/account/login").permitAll()
                         .requestMatchers("/api/cities/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/service-categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/allservices/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -100,5 +106,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
     }
 }
