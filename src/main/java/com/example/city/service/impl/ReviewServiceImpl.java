@@ -1,7 +1,11 @@
 package com.example.city.service.impl;
 
 import java.lang.StackWalker.Option;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
@@ -9,7 +13,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.city.model.dto.request.ReviewRequest;
+import com.example.city.model.dto.response.DetailServiceResponse;
 import com.example.city.model.dto.response.ReviewResponse;
+import com.example.city.model.dto.response.ReviewServiceResponse;
 import com.example.city.model.entity.Review;
 import com.example.city.model.entity.Service;
 import com.example.city.model.entity.User;
@@ -78,6 +84,40 @@ public class ReviewServiceImpl implements ReviewService {
       Review savedReview = this.reviewRepository.save(review);
       ReviewResponse res = modelMapper.map(savedReview, ReviewResponse.class);
 
+      return res;
+   }
+
+   @Override
+   public List<ReviewServiceResponse> getReviewsOfService(Long serviceId) {
+
+      List<ReviewServiceResponse> res = new ArrayList<ReviewServiceResponse>();
+
+      Service currentService = serviceRepository.findById(serviceId).get();
+                
+      if(currentService == null) {
+            throw new RuntimeException("Service not found with ID: " + serviceId);
+      }
+
+      List<Visit> visits = this.visitRepository.findByServiceId(currentService.getId());
+
+      if(!visits.isEmpty()) {
+         res = visits.stream().map(visit -> {
+            Review review = this.reviewRepository.findByVisitId(visit.getId());
+            User user = this.userRepository.findById(visit.getUser().getId()).get();
+            if (review != null) {
+               ReviewServiceResponse tempReview = new ReviewServiceResponse();
+               tempReview.setId(review.getId());
+               tempReview.setRating(review.getRating());
+               tempReview.setComment(review.getComment());
+               tempReview.setCreatedAt(review.getCreatedAt());
+               tempReview.setUserId(user.getId());
+               tempReview.setUserName(user.getUsername());
+               tempReview.setUserFullName(user.getFullName());
+               return tempReview;
+            }
+            return null;
+         }).filter(Objects::nonNull).collect(Collectors.toList());
+      }
       return res;
    }
 }
