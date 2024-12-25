@@ -72,5 +72,4 @@ public class ServiceController {
         serviceService.deleteService(cityId, id);
         return ResponseEntity.noContent().build();
     }
-
 }

@@ -3,9 +3,6 @@ package com.example.city.model.dto.response;
 import java.time.Instant;
 import java.util.List;
 
-import com.example.city.model.entity.City;
-import com.example.city.model.entity.ServiceCategory;
-
 import lombok.Getter;
 import lombok.Setter;
 

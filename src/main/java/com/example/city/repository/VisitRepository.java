@@ -14,5 +14,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long>{
 
    Optional<Visit> findByUserIdAndServiceId(Long userId, Long serviceId);
 
-   // boolean existsByUserIdAndServiceId(Long userId, Long serviceId);
+   boolean existsByUserIdAndServiceId(Long userId, Long serviceId);
+
 }

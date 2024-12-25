@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.city.model.dto.request.ReviewRequest;
 import com.example.city.model.dto.response.ReviewResponse;
-import com.example.city.model.entity.Review;
 import com.example.city.service.ReviewService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,9 +33,7 @@ public class ReviewController {
    public ResponseEntity<ReviewResponse> addReviewService(
          @PathVariable Long serviceId,
          @RequestBody @Valid ReviewRequest reviewRequest) {
-
             ReviewResponse reviewResponse = this.reviewService.addReviewService(serviceId, reviewRequest);
-
       return ResponseEntity.ok(reviewResponse);
-   }
+   }  
 }
