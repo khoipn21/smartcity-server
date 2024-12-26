@@ -64,6 +64,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/api/cities/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/service-categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/allservices/**").permitAll()
+                        .requestMatchers("/api/services/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -79,7 +80,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Replace with your allowed domain(s)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
 
         // Specify the allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

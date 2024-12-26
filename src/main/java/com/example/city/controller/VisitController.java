@@ -29,7 +29,6 @@ public class VisitController {
    }
 
    @PostMapping("/services/{serviceId}/visit")
-   @PreAuthorize("hasRole('ADMIN')")
    @Operation(summary = "Add a visit to Service", description = "Adds a new visit to a specific service. Only user can perform this action.")
    public ResponseEntity<String> addVisitService(@PathVariable Long serviceId) {
             this.visitService.addVisitToService(serviceId);
