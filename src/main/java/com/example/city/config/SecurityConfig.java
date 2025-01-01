@@ -4,6 +4,7 @@ import com.example.city.service.impl.TokenBlacklistService;
 import com.example.city.service.impl.UserDetailsServiceImpl;
 import com.example.city.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -32,6 +33,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
+
+    @Value("${cors.allowed-origins}")
+    private String[] allowedOrigins;
 
     @Autowired
     public SecurityConfig(UserDetailsServiceImpl userDetailsService,
@@ -80,7 +84,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Replace with your allowed domain(s)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
 
         // Specify the allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -91,11 +95,9 @@ public class SecurityConfig implements WebMvcConfigurer {
         // Allow credentials (e.g., cookies, authorization headers)
         configuration.setAllowCredentials(true);
 
-        // Optionally, set exposed headers
-        // configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply CORS settings to all endpoints
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
