@@ -59,6 +59,10 @@ public class ServiceServiceImpl implements ServiceService {
                 this.modelMapper = modelMapper;
                 this.reviewRepository = reviewRepository;
                 this.serviceImageRepository = serviceImageRepository;
+
+                modelMapper.typeMap(ServiceRequest.class, Service.class).addMappings(mapper -> {
+                        mapper.skip(Service::setId);
+                });
         }
 
         @Override
@@ -74,6 +78,8 @@ public class ServiceServiceImpl implements ServiceService {
                 Service service = modelMapper.map(serviceRequest, Service.class);
                 service.setCity(city);
                 service.setCategory(serviceCategory);
+
+                service.setId(null);
 
                 // Save the service
                 Service savedService = serviceRepository.save(service);
