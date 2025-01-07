@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 
 @RestController
@@ -132,14 +134,18 @@ public class AuthController {
 
     @PostMapping("/change-password")
     @Operation(summary = "Change password", description = "Changes the password of the current user.")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isChanged = userService.changePassword(userDetails.getUsername(), changePasswordRequest);
 
         if (isChanged) {
-            return ResponseEntity.ok("Password changed successfully.");
+            Map<String, String> successResponse = new HashMap<>();
+            successResponse.put("message", "Password changed successfully.");
+            return ResponseEntity.ok(successResponse);
         } else {
-            return ResponseEntity.badRequest().body("Current password is incorrect.");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Current password is incorrect.");
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 
